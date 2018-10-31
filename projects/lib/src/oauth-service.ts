@@ -1056,7 +1056,7 @@ export class OAuthService extends AuthConfig {
     }
 
     protected checkSession(): void {
-        const iframe: any = document.getElementById(this.sessionCheckIFrameName);
+        const iframe = document.getElementById(this.sessionCheckIFrameName) as HTMLIFrameElement;
 
         if (!iframe) {
             this.logger.warn(
@@ -1072,7 +1072,10 @@ export class OAuthService extends AuthConfig {
         }
 
         const message = this.clientId + ' ' + sessionState;
-        iframe.contentWindow.postMessage(message, this.issuer);
+        this.ngZone.runOutsideAngular(() => {
+            // keep the call out of angular zone
+            iframe.contentWindow.postMessage(message, this.issuer);
+        });
     }
 
     protected createLoginUrl(
